@@ -51,7 +51,7 @@ def resolve(json, path, auth = None, url = "https://api.glovoapp.com"):
 
 def from_json(code,json):
     if code >= 200 and code <= 300:
-        return loads (json)
+        return loads (json.decode('utf-8'))
     else :
         return { "reason" : json }
 
@@ -63,22 +63,24 @@ if __name__ == '__main__':
         mail = TEST_MAIL if DBG else generate_mail()
         code, res = register(mail)
         user = from_json(code,res)
-        print dumps(user, sort_keys=True, indent=4, separators=(',', ': '))
-
+        #print dumps(user, sort_keys=True, indent=4, separators=(',', ': '))
+        #Login/Token de session
         code, res = get_token(mail)
         jtoken = from_json(code,res)
-        print dumps(jtoken, sort_keys=True, indent=4, separators=(',', ': '))
-
+        #print dumps(jtoken, sort_keys=True, indent=4, separators=(',', ': '))
         #Promocode (debug or func) with dump
         code, res = promotion_code(jtoken["token"])
         prmo = from_json(code,res)
-        print dumps(prmo, sort_keys=True, indent=4, separators=(',', ': '))
+        #print dumps(prmo, sort_keys=True, indent=4, separators=(',', ': '))
+
         if not 'reason' in prmo : 
+            print "Resultado : [ %s ]" % prmo["message"]
             db.write(dumps({
                 "mail" : mail,
                 "pass" : "qwer1234",
                 "code" : CODES[0]
-                }, sort_keys=True, indent=4, separators=(',', ': ')))
+                },  
+                sort_keys=True, indent=4, separators=(',', ': ')))
         else:
             print "Error de carga !"
 
