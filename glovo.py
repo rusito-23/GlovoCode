@@ -2,6 +2,7 @@ from json import dumps, loads
 from mails import generate_mail
 from requests import post
 
+HOW_MANY = 2
 DBG       = False
 CODE      = "nolitaglovoco"
 TEST_MAIL = "iandruskiewitsch854@famaf.unc.edu.ar"
@@ -53,11 +54,18 @@ def resolve(data, path, auth=False, url="https://api.glovoapp.com"):
     return (code, reason, json)
 
 if __name__ == '__main__':
-    user = register(TEST_MAIL if DBG else generate_mail())
-    if user != 0:
-        (code, reason, json) = promotion_code(login(user))
-        try:
-            print(json['message'])
-        except KeyError:
-            print ("Error al cargar el código")
-            print(json)
+    for i in range (HOW_MANY):
+        db = open("nolita-accounts", "a")
+        user = register(TEST_MAIL if DBG else generate_mail())
+        if user != 0 and user != 1:
+            (code, reason, json) = promotion_code(login(user))
+            try:
+                print(json['message'] + "\n \n")
+                save = ("CUENTA: \n"
+                        + "email: " + user + "\n"
+                        + "password: qwer1234 \n"
+                        + "codigo: " + CODE + "\n \n")
+                db.write(save)
+            except KeyError:
+                print ("Error al cargar el código")
+                print(json)
