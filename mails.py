@@ -1,12 +1,12 @@
 #Python3
-import urllib.request as get
+import requests
 import re
 from bs4 import BeautifulSoup
 
 def generate_mail():
     #GET FULL WEBPAGE
     url = 'http://www.yopmail.com/en/email-generator.php'
-    content = get.urlopen(url).read()
+    content = requests.get(url).text
 
     #PARSE THE TAG
     #TO FIND THE EMAIL
@@ -14,3 +14,6 @@ def generate_mail():
     attributes = soup.find('input',{'id':'login'}).attrs
     email = attributes['value']
     return email
+
+if __name__ == '__main__':
+    print(generate_mail())
