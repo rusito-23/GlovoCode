@@ -4,7 +4,7 @@ from requests import post
 
 DBG       = False
 CODE      = "nolitaglovoco"
-TEST_MAIL = "fofibiddas-1600@yopmail.com"
+TEST_MAIL = "iandruskiewitsch854@famaf.unc.edu.ar"
 
 def register(email, path="/v3/users/customer"):
     print ("Registrando [ %s ]" % email)
@@ -18,27 +18,46 @@ def register(email, path="/v3/users/customer"):
         "privacySettings":["DATA_POLICY"],
         "shownPermissions":["MARKETING_CAMPAIGNS","DATA_POLICY"]
     }
-    return resolve(data, path)
+    (code, reason, json) = resolve(data, path)
+    try:
+        msg = json["error"]["message"]
+        if msg == "Email already exists":
+            print ("El email ya existe: "+str(code)+" : "+reason)
+            return 0
+        else:
+            return 1
+    except KeyError:
+        return email
 
-def promotion_code(path="/v3/promocodes"):
+def promotion_code(token, path="/v3/promocodes"):
     print ("Pidiendo codigo [ %s ]" % CODE)
     data = {"code": CODE}
-    return resolve(data, path)
+    return resolve(data, path, auth=token)
 
-def resolve(data, path, url="https://api.glovoapp.com"):
+def login(email, path="/v3/oauth/token"):
+    print ("Loggeando [ %s ]" % email)
+    data = {
+        "grantType":"password",
+        "email":email,
+        "password":"qwer1234"
+    }
+    (code, reason, json) = resolve(data, path)
+    return json["token"]
+
+def resolve(data, path, auth=False, url="https://api.glovoapp.com"):
     headers = {'content-type': 'application/json'}
-    res = post(url + path, data=dumps(data), headers=headers)
+    if auth:
+        headers['Authorization'] = auth
+    res = post(url + path, data=dumps(data), headers=headers, )
     code, reason, json = res.status_code, res.reason, loads(res.text)
-    if code >= 200 and code <= 300:
-        print ("Petición exitosa: "+str(code)+" : "+reason)
-        return res
-    if json["error"]["message"] == "Email already exists" :
-        print ("El email ya existe: "+str(code)+" : "+reason)
-        return -1
-    else:
-        print ("Error: "+str(code)+" : "+reason)
-        return 0
+    return (code, reason, json)
 
 if __name__ == '__main__':
     user = register(TEST_MAIL if DBG else generate_mail())
-    user = login(user)
+    if user != 0:
+        (code, reason, json) = promotion_code(login(user))
+        try:
+            print(json['message'])
+        except KeyError:
+            print ("Error al cargar el código")
+            print(json)
