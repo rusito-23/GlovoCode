@@ -1,0 +1,4 @@
+git checkout master
+time python mails.py
+git checkout py3
+time python3 mails.py
