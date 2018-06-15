@@ -3,8 +3,10 @@ from json import dumps, loads
 from mails import generate_mail
 
 DBG       = False
-CODE      = "nolitaglovoco"
+HOW_MANY  = 2
+CODES     = ["nolitaglovoco","mostaglovoco"]
 TEST_MAIL = "fofibiddas-1600@yopmail.com"
+DATA_BASE = "-accounts"
 
 def register(email, path = '/v3/users/customer') :
     print "Registrando [ %s ]" % email
@@ -20,13 +22,24 @@ def register(email, path = '/v3/users/customer') :
     }
     return resolve (data,path)
 
-def promotion_code(user, path = '/v3/promocodes'):
-    print "Pidiendo codigo [ %s ]" % CODE
-    return resolve ({ "code" : CODE },path)
+def get_token(email,path = '/v3/oauth/token'):
+    print "Obteniendo token [ %s ]" % email
+    data = {
+        "email":email,
+        "password":"qwer1234",
+        "grantType":"password"
+    }
+    return resolve (data,path)
 
-def resolve(json, path, url = "https://api.glovoapp.com"):
+def promotion_code(token, path = '/v3/promocodes'):
+    print "Pidiendo codigo [ %s ]" % CODES[0]
+    return resolve ({ "code" : CODES[0] },path,token)
+
+def resolve(json, path, auth = None, url = "https://api.glovoapp.com"):
     req = urllib2.Request(url + path)
-    req.add_header('Content-type','application/json')
+    req.add_header('Content-type','application/json') 
+    if auth is not None : 
+        req.add_header('Authorization',auth)
     req.add_data(dumps(json))
     res = (0,"")
     try:
@@ -44,13 +57,29 @@ def from_json(code,json):
 
 
 if __name__ == '__main__':
-    #Register (debug or func) with dump
-    code, res = register(TEST_MAIL if DBG else generate_mail())
-    user = from_json(code,res)
-    print dumps(user, sort_keys=True, indent=4, separators=(',', ': '))
+    for i in range(HOW_MANY):
+        db = open(CODES[0].replace("glovoco","") + DATA_BASE,"a")
+        #Register (debug or func) with dump
+        mail = TEST_MAIL if DBG else generate_mail()
+        code, res = register(mail)
+        user = from_json(code,res)
+        print dumps(user, sort_keys=True, indent=4, separators=(',', ': '))
 
-    #Promocode (debug or func) with dump
-    code, res = promotion_code(user)
-    prmo = from_json(code,res)
-    print dumps(prmo, sort_keys=True, indent=4, separators=(',', ': '))
+        code, res = get_token(mail)
+        jtoken = from_json(code,res)
+        print dumps(jtoken, sort_keys=True, indent=4, separators=(',', ': '))
+
+        #Promocode (debug or func) with dump
+        code, res = promotion_code(jtoken["token"])
+        prmo = from_json(code,res)
+        print dumps(prmo, sort_keys=True, indent=4, separators=(',', ': '))
+        if not 'reason' in prmo : 
+            db.write(dumps({
+                "mail" : mail,
+                "pass" : "qwer1234",
+                "code" : CODES[0]
+                }, sort_keys=True, indent=4, separators=(',', ': ')))
+        else:
+            print "Error de carga !"
+
     
