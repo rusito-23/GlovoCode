@@ -47,8 +47,7 @@ Y por sorpresa el paquete que envia es :
 ```
 Esto nos da cierta esperanza de la solucion en la api `/v3/users/` hay un modo de subir los cambios no solo del name o del mail, si no del PHONE NUMBER
 ahora si nos fijamos bien el path `glv:customer:0b0790b4-76ac-4b1d-b104-1b61626607d1` es un parametro de una request que se pide : 
-GET [ Con Authorization : <token> ] 
-https://api.glovoapp.com/v3/me
+GET [ Con Authorization : <token> ] -> https://api.glovoapp.com/v3/me
 O bien es tambien el resultado despues de un register !
 ambos son el mismo json, la key "urn" es el path
 
@@ -61,7 +60,19 @@ Por alguna razon (que obviamente nos estamos perdiendo devuelve lo siguiente)
         "message": "/v3/users/glv:customer:548374e2-c96f-4b48-b76c-9a89a92986e3 NOT FOUND"
     }
 ```
+Era PUT, pero ahora tira : 
+```
 
+    "error": {
+        "userInfo": {},
+        "requestId": "HjIeya8yCU7h",
+        "domain": "com.glovoapp.core-services",
+        "id": "789p6lc7m",
+        "message": "Error: HjIeya8yCU7h"
+    }
+```
+Al final logre hacer le PUT, recien me habia olvidado de setear el application/json
+La buena es que si cambia el nombre, pero el phone NO CAMBIO sigue en estado = null
 
 #API Reverse engineering
 
