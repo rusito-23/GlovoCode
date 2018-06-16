@@ -13,7 +13,7 @@ def register(email, path = '/v3/users/customer') :
     data = {
         "email":email,
         "password":"qwer1234",
-        "name":"beta",
+        "name":"man23",
         "preferredLanguage":"es",
         "mediaSource":"Organic Web",
         "mediaCampaign":"Organic Web",
