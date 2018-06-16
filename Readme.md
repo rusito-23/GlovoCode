@@ -1,5 +1,31 @@
+##17/06 Update (Status : Warn)
+Encontre una forma de setear el phoneNumber sin hacer la verificacion
+Si uno en el register mete el numero de telefono como otro campo : 
+```
+{
+  "email":"egavetess-0765@yopmail.com",
+  "password":"qwer1234",
+  "name":"beta",
+  "phoneNumber" : { "number" : "+543516465313", "countryCode" : "ES" },
+  "preferredLanguage":"es",
+  "mediaSource":"Organic Web",
+  "mediaCampaign":"Organic Web",
+  "privacySettings":["DATA_POLICY"],
+  "shownPermissions":["MARKETING_CAMPAIGNS","DATA_POLICY"]
+}
+```
+
+Aun asi TIENEN OTRO CAMPO QUE DETERMINA SI ESTA VERIFICADO... VERY CLEVER
+Si uno hace un 
+GET https://api.glovoapp.com/v3/whats_up (token blah blah)
+
+Viene un campo llamado : 
+"phoneVerificationRequired" : false | true
+
+
 ##16/06 Update (Status : Warn)
 Actualizaron el servidor y los front-end (tanto la app fecha 15/06) como la web.
+
 * Phone BlackList : Ahora algunos telefonos (capaz aquellos que ya se usaron en
 otra cuenta) estan en una blacklist la cual no te permite pasar la etapa de verificacion
 
